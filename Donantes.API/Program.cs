@@ -14,11 +14,7 @@ builder.Services.AddDbContext<BloodDonationDbContext>(options =>
 );
 
 builder.Services.AddScoped<IDonadorService, DonadorService>();
-
-builder.Services.AddScoped<
-    ISolicitudSangreService,
-    SolicitudSangreService
->();
+builder.Services.AddScoped<ISolicitudSangreService, SolicitudSangreService>();
 
 builder.Services.AddEndpointsApiExplorer();
 
