@@ -1,9 +1,14 @@
 
 
+using Microsoft.AspNetCore.Mvc;
+
 namespace Donantes.API.Controllers
 {
-    public class DonadoresController
+     [ApiController] 
+     [Route("api/donadores")]
+    public class DonadoresController : ControllerBase
     {
-        
+      
+
     }
 }
