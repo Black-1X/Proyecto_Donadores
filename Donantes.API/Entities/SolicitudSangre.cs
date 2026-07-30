@@ -2,11 +2,10 @@
 
 namespace Donantes.API.Entities
 {
-    public class SolicitudSangre
+    public class SolicitudSangre : BaseEntity
     {
-      public string? Id { get; set; }  
 
-      public string? Blood_type { get; set; }
+      public string? BloodType { get; set; }
       public string? Hospital { get; set; }
       public string? Contact { get; set; }
       public string? City { get; set; }

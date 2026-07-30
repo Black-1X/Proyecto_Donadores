@@ -1,18 +1,15 @@
-
 namespace Donantes.API.Entities
 {
-    public class Donador
+    public class Donador : BaseEntity
     {
-        public string? Id {get; set;}
+        public string Name { get; set; } = string.Empty;
 
-        public string? Name {get; set;}
-         
-         public string? Blood_type { get; set; }
+        public string BloodType { get; set; } = string.Empty;
 
-         public string? Phone { get; set; }
+        public string Phone { get; set; } = string.Empty;
 
-         public string? City {get; set;}
+        public string City { get; set; } = string.Empty;
 
-         public bool  Available { get; set; }
+        public bool Available { get; set; }
     }
 }

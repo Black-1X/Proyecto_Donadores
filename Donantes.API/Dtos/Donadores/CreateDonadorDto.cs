@@ -8,7 +8,7 @@ namespace Donantes.API.Dtos.Donadores
 
         public string TipoSangre { get; set; } = string.Empty;
 
-        public string Teléfono { get; set; } = string.Empty;
+        public string Telefono { get; set; } = string.Empty;
 
         public string Ciudad { get; set; } = string.Empty;
 
