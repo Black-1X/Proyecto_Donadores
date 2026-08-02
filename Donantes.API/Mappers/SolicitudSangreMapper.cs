@@ -1,16 +1,10 @@
-
-
 using Donantes.API.Dtos.SolicitudesSangre;
-using Donantes.API.Dtos;
 using Donantes.API.Entities;
 
 namespace Donantes.API.Mappers
 {
-  
-    
     public static class SolicitudSangreMapper
     {
-        // Convierte el DTO de creación en una entidad
         public static SolicitudSangre ToEntity(
             CreateSolicitudSangreDto dto
         )
@@ -21,11 +15,15 @@ namespace Donantes.API.Mappers
                 Hospital = dto.Hospital,
                 Contact = dto.Contacto,
                 City = dto.Ciudad,
-                Status = dto.Estado
+
+                // Toda solicitud comienza activa
+                Status = true,
+
+                // Todavía no tiene donador
+                DonadorId = null
             };
         }
 
-        // Convierte la entidad en un DTO de respuesta
         public static ResponseSolicitudSangreDto ToDto(
             SolicitudSangre entity
         )
@@ -37,11 +35,13 @@ namespace Donantes.API.Mappers
                 Hospital = entity.Hospital,
                 Contacto = entity.Contact,
                 Ciudad = entity.City,
-                Estado = entity.Status
+                Estado = entity.Status,
+                DonadorId = entity.DonadorId,
+                CreatedDate = entity.CreatedDate.ToString("dd-MM-yy"),
+                ModifiedDate = entity.ModifiedDate?.ToString("dd-MM-yy")
             };
         }
 
-        // Actualiza una entidad existente
         public static void UpdateEntity(
             UpdateSolicitudSangreDto dto,
             SolicitudSangre entity
@@ -51,9 +51,7 @@ namespace Donantes.API.Mappers
             entity.Hospital = dto.Hospital;
             entity.Contact = dto.Contacto;
             entity.City = dto.Ciudad;
-            entity.Status = dto.Estado;
             entity.ModifiedDate = DateTime.UtcNow;
+        }
     }
-    
-    }
-    }
+}

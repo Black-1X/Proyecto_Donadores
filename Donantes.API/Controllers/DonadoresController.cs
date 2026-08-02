@@ -1,99 +1,98 @@
-
-using Donantes.API.Database;
 using Donantes.API.Dtos.Common;
 using Donantes.API.Dtos.Donadores;
-using Donantes.API.Entities;
 using Donantes.API.Services.Donadores;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 
 namespace Donantes.API.Controllers
 {
-   [ApiController]
+    [ApiController]
     [Route("api/donadores")]
     public class DonadoresController : ControllerBase
     {
-        private readonly BloodDonationDbContext _context;
+        private readonly IDonadorService _donadorService;
 
-        public DonadoresController(BloodDonationDbContext context)
+        // Inyectamos el servicio de donadores
+        public DonadoresController(IDonadorService donadorService)
         {
-            _context = context;
+            _donadorService = donadorService;
         }
 
-       
-        [HttpGet]
-        public async Task<ActionResult<IEnumerable<Donador>>> GetDonadores()
-        {
-            return await _context.Donadores.ToListAsync();
-           
-        }
+        // Obtener todos los donadores
+        // Obtener y buscar donadores con paginación
+[HttpGet]
+public async Task<
+    ActionResult<ResponseDto<PageDto<List<ResponseDonadorDto>>>>
+> GetDonadores(
+    [FromQuery] string searchTerm = "",
+    [FromQuery] int page = 1,
+    [FromQuery] int pageSize = 10
+)
+{
+    var response = await _donadorService.GetPageAsync(
+        searchTerm,
+        page,
+        pageSize
+    );
 
-       
+    return StatusCode(
+        response.StatusCode,
+        response
+    );
+}
+
+        // Obtener un donador por su Id
         [HttpGet("{id}")]
-        public async Task<ActionResult<Donador>> GetDonador(string id)
+        public async Task<ActionResult<ResponseDto<ResponseDonadorDto>>>
+            GetDonador(string id)
         {
-            var donador = await _context.Donadores.FindAsync(id);
+            var response = await _donadorService.GetByIdAsync(id);
 
-            if (donador == null)
-                return NotFound("Donador no encontrado.");
-
-            return donador;
-        }
-
-       
-        [HttpPost]
-        public async Task<ActionResult<Donador>> CrearDonador(Donador donador)
-        {
-            _context.Donadores.Add(donador);
-            await _context.SaveChangesAsync();
-
-            return CreatedAtAction(
-                nameof(GetDonador),
-                new { id = donador.Id },
-                donador
+            return StatusCode(
+                response.StatusCode,
+                response
             );
         }
 
-       
-        [HttpPut("{id}")]
-        public async Task<IActionResult> ActualizarDonador(string id, Donador donador)
+        // Crear un nuevo donador
+        [HttpPost]
+        public async Task<ActionResult<ResponseDto<ResponseDonadorDto>>>
+            CrearDonador([FromBody] CreateDonadorDto dto)
         {
-            if (id != donador.Id)
-                return BadRequest("El Id no coincide.");
+            var response = await _donadorService.CreateAsync(dto);
 
-            _context.Entry(donador).State = EntityState.Modified;
-
-            try
-            {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!_context.Donadores.Any(d => d.Id == id))
-                    return NotFound("Donador no encontrado.");
-
-                throw;
-            }
-
-            return NoContent();
+            return StatusCode(
+                response.StatusCode,
+                response
+            );
         }
 
-       
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> EliminarDonador(string id)
+        // Actualizar un donador
+        [HttpPut("{id}")]
+        public async Task<ActionResult<ResponseDto<ResponseDonadorDto>>>
+            ActualizarDonador(
+                string id,
+                [FromBody] UpdateDonadorDto dto
+            )
         {
-            var donador = await _context.Donadores.FindAsync(id);
+            var response = await _donadorService.UpdateAsync(id, dto);
 
-            if (donador == null)
-                return NotFound("Donador no encontrado.");
+            return StatusCode(
+                response.StatusCode,
+                response
+            );
+        }
 
-            _context.Donadores.Remove(donador);
-            await _context.SaveChangesAsync();
+        // Eliminar un donador
+        [HttpDelete("{id}")]
+        public async Task<ActionResult<ResponseDto<bool>>>
+            EliminarDonador(string id)
+        {
+            var response = await _donadorService.DeleteAsync(id);
 
-            return NoContent();
-
-      
-     
+            return StatusCode(
+                response.StatusCode,
+                response
+            );
+        }
     }
-}
 }

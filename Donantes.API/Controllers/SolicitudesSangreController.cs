@@ -1,4 +1,5 @@
 using Donantes.API.Dtos.Common;
+using Donantes.API.Dtos.Donadores;
 using Donantes.API.Dtos.SolicitudesSangre;
 using Donantes.API.Services.SolicitudesSangre;
 using Microsoft.AspNetCore.Mvc;
@@ -19,12 +20,21 @@ namespace Donantes.API.Controllers
         }
 
         // GET: api/solicitudes-sangre
+        // Obtener solicitudes con paginación
+// Obtener y buscar solicitudes con paginación
         [HttpGet]
-        public async Task<
-            ActionResult<ResponseDto<List<ResponseSolicitudSangreDto>>>
-        > GetAll()
+        public async Task<ActionResult<ResponseDto<PageDto<List<ResponseSolicitudSangreDto>>>>> GetAll(
+            [FromQuery] string searchTerm = "",
+            [FromQuery] int page = 1,
+            [FromQuery] int pageSize = 10
+        )
         {
-            var response = await _solicitudSangreService.GetAllAsync();
+            var response =
+                await _solicitudSangreService.GetPageAsync(
+                    searchTerm,
+                    page,
+                    pageSize
+                );
 
             return StatusCode(
                 response.StatusCode,
@@ -49,10 +59,11 @@ namespace Donantes.API.Controllers
         // POST: api/solicitudes-sangre
         [HttpPost]
         public async Task<
-            ActionResult<ResponseDto<ResponseSolicitudSangreDto>>
+            ActionResult<ResponseDto<CreateSolicitudResponseDto>>
         > Create([FromBody] CreateSolicitudSangreDto dto)
         {
-            var response = await _solicitudSangreService.CreateAsync(dto);
+            var response =
+                await _solicitudSangreService.CreateAsync(dto);
 
             return StatusCode(
                 response.StatusCode,
@@ -89,5 +100,43 @@ namespace Donantes.API.Controllers
                 response
             );
         }
+
+
+        [HttpGet("{id}/donadores-disponibles")]
+        public async Task<
+            ActionResult<ResponseDto<List<ResponseDonadorDto>>>
+        > GetDonadoresDisponibles(string id)
+        {
+            var response =
+                await _solicitudSangreService
+                    .GetDonantesDisponiblesAsync(id);
+
+            return StatusCode(
+                response.StatusCode,
+                response
+            );
+        }
+
+
+       [HttpPut("asignar-donador")]
+        public async Task<
+            ActionResult<ResponseDto<ResponseSolicitudSangreDto>>
+        > AsignarDonador(
+            [FromBody] AsignarDonadorDto dto
+        )
+        {
+            var response =
+                await _solicitudSangreService
+                    .AsignarDonadorAsync(
+                        dto.SolicitudId,
+                        dto.DonadorId
+                    );
+
+            return StatusCode(
+                response.StatusCode,
+                response
+            );
+        }
+
     }
 }

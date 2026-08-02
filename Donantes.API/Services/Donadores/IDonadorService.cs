@@ -5,8 +5,11 @@ namespace Donantes.API.Services.Donadores
 {
     public interface IDonadorService
     {
-        Task<ResponseDto<List<ResponseDonadorDto>>> GetAllAsync();
-
+        Task<ResponseDto<PageDto<List<ResponseDonadorDto>>>> GetPageAsync(
+            string searchTerm = "",
+            int page = 1,
+            int pageSize = 10
+        );
         Task<ResponseDto<ResponseDonadorDto>> GetByIdAsync(string id);
 
         Task<ResponseDto<ResponseDonadorDto>> CreateAsync(
