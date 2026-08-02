@@ -14,7 +14,7 @@ namespace Donantes.API.Services.SolicitudesSangre
                 int pageSize = 10
             );
 
-        Task<ResponseDto<ResponseSolicitudSangreDto>>
+        Task<ResponseDto<CreateSolicitudResponseDto>>
             GetByIdAsync(string id);
 
         Task<ResponseDto<CreateSolicitudResponseDto>>

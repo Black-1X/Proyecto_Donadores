@@ -122,30 +122,58 @@ namespace Donantes.API.Services.SolicitudesSangre
                 };
             }
 
-        public async Task<ResponseDto<ResponseSolicitudSangreDto>> GetByIdAsync(string id)
+       public async Task<ResponseDto<CreateSolicitudResponseDto>> GetByIdAsync(string id)
+{
+    var solicitud = await _context.SolicitudesSangre
+        .AsNoTracking()
+        .FirstOrDefaultAsync(s => s.Id == id);
+
+    if (solicitud is null)
+    {
+        return new ResponseDto<CreateSolicitudResponseDto>
         {
-            var solicitud = await _context.SolicitudesSangre
-                .AsNoTracking()
-                .FirstOrDefaultAsync(s => s.Id == id);
+            StatusCode = HttpStatusCode.NotFound,
+            Status = false,
+            Message = "Solicitud no encontrada."
+        };
+    }
 
-            if (solicitud is null)
-            {
-                return new ResponseDto<ResponseSolicitudSangreDto>
-                {
-                    StatusCode = 404,
-                    Status = false,
-                    Message = "Solicitud no encontrada."
-                };
-            }
+    var tipoSangre = solicitud.BloodType
+        .Trim()
+        .ToUpper();
 
-            return new ResponseDto<ResponseSolicitudSangreDto>
-            {
-                StatusCode = 200,
-                Status = true,
-                Message = "Solicitud encontrada.",
-                Data = SolicitudSangreMapper.ToDto(solicitud)
-            };
+    var ciudadSolicitud = solicitud.City
+        .Trim()
+        .ToUpper();
+
+    var donantes = await _context.Donadores
+        .AsNoTracking()
+        .Where(d =>
+            d.Available &&
+            d.BloodType.ToUpper() == tipoSangre
+        )
+        .OrderByDescending(d =>
+            d.City.ToUpper() == ciudadSolicitud
+        )
+        .ThenBy(d => d.Name)
+        .ToListAsync();
+
+    return new ResponseDto<CreateSolicitudResponseDto>
+    {
+        StatusCode = HttpStatusCode.OK,
+        Status = true,
+        Message = donantes.Count > 0
+            ? "Solicitud encontrada. Se encontraron donantes disponibles."
+            : "Solicitud encontrada, pero no hay donantes disponibles.",
+        Data = new CreateSolicitudResponseDto
+        {
+            Solicitud = SolicitudSangreMapper.ToDto(solicitud),
+            DonantesDisponibles = donantes
+                .Select(DonadorMapper.ToDto)
+                .ToList()
         }
+    };
+}
 
         public async Task<ResponseDto<CreateSolicitudResponseDto>> CreateAsync(CreateSolicitudSangreDto dto)
         {

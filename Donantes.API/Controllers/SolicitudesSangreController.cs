@@ -44,11 +44,11 @@ namespace Donantes.API.Controllers
 
         // GET: api/solicitudes-sangre/{id}
         [HttpGet("{id}")]
-        public async Task<
-            ActionResult<ResponseDto<ResponseSolicitudSangreDto>>
-        > GetById(string id)
+        public async Task<ActionResult<ResponseDto<CreateSolicitudResponseDto>>>
+            GetById(string id)
         {
-            var response = await _solicitudSangreService.GetByIdAsync(id);
+            var response =
+                await _solicitudSangreService.GetByIdAsync(id);
 
             return StatusCode(
                 response.StatusCode,
